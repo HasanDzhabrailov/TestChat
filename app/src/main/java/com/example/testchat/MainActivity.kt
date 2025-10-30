@@ -3,46 +3,28 @@ package com.example.testchat
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.arkivanov.decompose.defaultComponentContext
+import com.example.testchat.core.media.MediaAttachmentComponent
+import com.example.testchat.feature.root.RootComponent
+import com.example.testchat.feature.root.RootComponentFactory
+import com.example.testchat.feature.root.RootContent
 import com.example.testchat.ui.theme.TestChatTheme
+import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
 
-	override fun onCreate(savedInstanceState: Bundle?) {
-		super.onCreate(savedInstanceState)
-		enableEdgeToEdge()
-		setContent {
-			TestChatTheme {
-				Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-					Greeting(
-						name = "Android",
-						modifier = Modifier.padding(innerPadding)
-					)
-				}
-			}
-		}
-	}
-}
+    private val rootComponentFactory: RootComponentFactory by inject()
+    private val mediaAttachmentComponent: MediaAttachmentComponent by inject()
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-	Text(
-		text = "Hello $name!",
-		modifier = modifier
-	)
-}
+    private lateinit var rootComponent: RootComponent
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-	TestChatTheme {
-		Greeting("Android")
-	}
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        rootComponent = rootComponentFactory.create(defaultComponentContext())
+        setContent {
+            TestChatTheme {
+                RootContent(rootComponent, mediaAttachmentComponent)
+            }
+        }
+    }
 }
